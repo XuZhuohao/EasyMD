@@ -48,25 +48,31 @@ fun FileListScreen(
             Column {
                 // Search bar
                 SearchBar(
-                    query = state.searchQuery,
-                    onQueryChange = viewModel::onSearchQuery,
-                    onSearch = {},
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text("搜索文档…", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                    leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                    trailingIcon = {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("H", color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                        }
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = state.searchQuery,
+                            onQueryChange = viewModel::onSearchQuery,
+                            onSearch = {},
+                            expanded = false,
+                            onExpandedChange = {},
+                            placeholder = { Text("搜索文档…", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                            leadingIcon = { Icon(Icons.Outlined.Search, null) },
+                            trailingIcon = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("H", color = MaterialTheme.colorScheme.onPrimary,
+                                        fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        )
                     },
+                    expanded = false,
+                    onExpandedChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -107,7 +113,7 @@ fun FileListScreen(
                             doc = doc,
                             onOpen = { onOpenFile(doc.file) },
                             onLongPress = { contextMenuNode = doc },
-                            modifier = Modifier.animateItemPlacement()
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
