@@ -33,11 +33,14 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation(settings: AppSettings = AppSettings()) {
+fun AppNavigation(
+    settings: AppSettings = AppSettings(),
+    initialFile: File? = null
+) {
     val navController = rememberNavController()
 
     // Shared open-document state (lifted to navigation level)
-    var openFile by remember { mutableStateOf<File?>(null) }
+    var openFile by remember { mutableStateOf<File?>(initialFile) }
 
     val startDest = if (settings.hasCompletedOnboarding) Screen.Files.route else Screen.Onboarding.route
 

@@ -23,7 +23,27 @@ class FileRepositoryImpl @Inject constructor(
 ) : FileRepository {
 
     override val rootDir: File by lazy {
-        File(context.filesDir, "documents").also { it.mkdirs() }
+        // Use external app-specific dir (visible in file manager, no permission needed API 29+)
+        val base = context.getExternalFilesDir(null) ?: context.filesDir
+        File(base, "EasyMD").also {
+            it.mkdirs()
+            // Create welcome file on first launch
+            val welcome = File(it, "Welcome.md")
+            if (!welcome.exists()) {
+                welcome.writeText(
+                    "# 欢迎使用 EasyMD\n\n" +
+                    "这是你的第一篇文档。\n\n" +
+                    "## 基本语法\n\n" +
+                    "- **粗体**：`**文字**`\n" +
+                    "- *斜体*：`*文字*`\n" +
+                    "- `代码`：`` `代码` ``\n\n" +
+                    "## 文件位置\n\n" +
+                    "你的文档存放在：\n" +
+                    "`Android/data/com.easymd/files/EasyMD/`\n\n" +
+                    "可以用文件管理器直接访问和添加 `.md` 文件。\n"
+                )
+            }
+        }
     }
 
     // ── Tree loading ─────────────────────────────────────────────────────────
@@ -33,7 +53,7 @@ class FileRepositoryImpl @Inject constructor(
     }
 
     override fun observeFiles(root: File): Flow<List<FileNode>> = callbackFlow<List<FileNode>> {
-        var lastSnapshot = listOf<FileNode>()
+        var lastSnapshot: List<FileNode>? = null  // null = never sent
 
         fun pushIfChanged() {
             val tree = buildTree(root)
@@ -49,7 +69,7 @@ class FileRepositoryImpl @Inject constructor(
             }
         }
         observer.startWatching()
-        pushIfChanged() // initial emit
+        pushIfChanged() // always emit initial state (even if empty)
         awaitClose { observer.stopWatching() }
     }.flowOn(Dispatchers.IO)
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- White document shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,20 L70,20 L80,30 L80,88 L28,88 L28,20 Z"/>
+
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#D0D8FF"
+        android:pathData="M70,20 L70,30 L80,30 Z"/>
+
+    <!-- M letter (Markdown) -->
+    <path
+        android:fillColor="#1B6EF3"
+        android:strokeColor="#1B6EF3"
+        android:strokeWidth="1"
+        android:pathData="M36,70 L36,50 L44,62 L52,50 L52,70 L48,70 L48,58 L44,65 L40,58 L40,70 Z"/>
+
+    <!-- Down arrow (↓) -->
+    <path
+        android:fillColor="#1B6EF3"
+        android:pathData="M58,50 L62,50 L62,62 L66,62 L60,70 L54,62 L58,62 Z"/>
+
+</vector>
