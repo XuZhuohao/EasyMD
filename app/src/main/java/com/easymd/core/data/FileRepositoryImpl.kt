@@ -7,12 +7,9 @@ import com.easymd.core.model.SyncState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import android.os.FileObserver
 import java.io.File
@@ -35,24 +32,24 @@ class FileRepositoryImpl @Inject constructor(
         buildTree(root)
     }
 
-    override fun observeFiles(root: File): Flow<List<FileNode>> = callbackFlow {
+    override fun observeFiles(root: File): Flow<List<FileNode>> = callbackFlow<List<FileNode>> {
         var lastSnapshot = listOf<FileNode>()
-        val observer = object : FileObserver(root.absolutePath, ALL_EVENTS) {
-            override fun onEvent(event: Int, path: String?) {
-                trySend(Unit)
-            }
-        }
-        observer.startWatching()
-        // initial emit
-        trySend(Unit)
-        // collect
-        for (unit in channel) {
+
+        fun pushIfChanged() {
             val tree = buildTree(root)
             if (tree != lastSnapshot) {
                 lastSnapshot = tree
-                send(tree)
+                trySend(tree)
             }
         }
+
+        val observer = object : FileObserver(root.absolutePath, ALL_EVENTS) {
+            override fun onEvent(event: Int, path: String?) {
+                pushIfChanged()
+            }
+        }
+        observer.startWatching()
+        pushIfChanged() // initial emit
         awaitClose { observer.stopWatching() }
     }.flowOn(Dispatchers.IO)
 
