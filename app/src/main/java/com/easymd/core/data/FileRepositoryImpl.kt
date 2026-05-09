@@ -1,8 +1,6 @@
 package com.easymd.core.data
 
 import android.content.Context
-import android.os.Build
-import android.os.storage.StorageManager
 import com.easymd.core.model.Document
 import com.easymd.core.model.FileNode
 import com.easymd.core.model.SyncState
@@ -16,8 +14,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import android.os.FileObserver
 import java.io.File
-import java.io.FileObserver
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +37,7 @@ class FileRepositoryImpl @Inject constructor(
 
     override fun observeFiles(root: File): Flow<List<FileNode>> = callbackFlow {
         var lastSnapshot = listOf<FileNode>()
-        val observer = object : FileObserver(root, ALL_EVENTS) {
+        val observer = object : FileObserver(root.absolutePath, ALL_EVENTS) {
             override fun onEvent(event: Int, path: String?) {
                 trySend(Unit)
             }
@@ -110,13 +108,8 @@ class FileRepositoryImpl @Inject constructor(
         unique
     }
 
-    override suspend fun deleteFile(file: File) = withContext(Dispatchers.IO) {
+    override suspend fun deleteFile(file: File): Unit = withContext(Dispatchers.IO) {
         if (!file.exists()) throw FileError.NotFound(file)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val sm = context.getSystemService(StorageManager::class.java)
-            sm.storageVolumes.firstOrNull()?.createOpenDocumentTreeIntent()
-            // For scoped storage, just delete directly from app files dir
-        }
         file.deleteRecursively()
     }
 

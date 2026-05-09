@@ -245,6 +245,7 @@ private fun FileDocRow(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FolderRow(folder: FileNode.Folder, onOpen: () -> Unit) {
     Row(
@@ -281,7 +282,7 @@ private fun SyncIcon(state: SyncState) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun FileContextSheet(
     node: FileNode.Doc,
